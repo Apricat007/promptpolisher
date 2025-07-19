@@ -11,27 +11,55 @@ const ResetPassword = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [validSession, setValidSession] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
-    // Check if we have the necessary tokens from the URL
-    const accessToken = searchParams.get('access_token');
-    const refreshToken = searchParams.get('refresh_token');
-    
-    if (!accessToken || !refreshToken) {
-      toast({
-        title: "Invalid reset link",
-        description: "This password reset link is invalid or has expired",
-        variant: "destructive"
-      });
-      navigate('/auth');
-    }
-  }, [searchParams, navigate, toast]);
+    const checkSession = async () => {
+      // Check if this is a password recovery session
+      const { data: { session }, error } = await supabase.auth.getSession();
+      
+      if (error || !session) {
+        toast({
+          title: "Invalid reset link",
+          description: "This password reset link is invalid or has expired",
+          variant: "destructive"
+        });
+        navigate('/auth');
+        return;
+      }
+      
+      setValidSession(true);
+    };
+
+    // Handle auth state change for password recovery
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        setValidSession(true);
+      } else if (event === 'SIGNED_IN' && session) {
+        // Check if this is coming from a password recovery flow
+        setValidSession(true);
+      }
+    });
+
+    checkSession();
+
+    return () => subscription.unsubscribe();
+  }, [navigate, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validSession) {
+      toast({
+        title: "Error",
+        description: "Invalid session. Please try the reset link again.",
+        variant: "destructive"
+      });
+      return;
+    }
     
     if (password !== confirmPassword) {
       toast({
@@ -62,9 +90,11 @@ const ResetPassword = () => {
 
       toast({
         title: "Password updated!",
-        description: "Your password has been successfully updated"
+        description: "Your password has been successfully updated. You can now sign in with your new password."
       });
       
+      // Sign out the user so they need to sign in with the new password
+      await supabase.auth.signOut();
       navigate('/auth');
     } catch (error: any) {
       toast({
@@ -76,6 +106,18 @@ const ResetPassword = () => {
       setLoading(false);
     }
   };
+
+  if (!validSession) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md bg-white/10 backdrop-blur-lg border-white/20">
+          <CardContent className="pt-6 text-center text-white">
+            <p>Validating reset link...</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center p-4">
