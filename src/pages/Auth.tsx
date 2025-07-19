@@ -10,12 +10,13 @@ import { useNavigate } from "react-router-dom";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
-  const { signIn, signUp, user } = useAuth();
+  const { signIn, signUp, user, resetPassword } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,7 +30,15 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      if (isLogin) {
+      if (showForgotPassword) {
+        const { error } = await resetPassword(email);
+        if (error) throw error;
+        toast({
+          title: "Reset email sent!",
+          description: "Check your email for password reset instructions"
+        });
+        setShowForgotPassword(false);
+      } else if (isLogin) {
         const { error } = await signIn(email, password);
         if (error) throw error;
         toast({
@@ -67,12 +76,12 @@ const Auth = () => {
             </h1>
           </div>
           <CardTitle className="text-white">
-            {isLogin ? 'Welcome Back' : 'Create Account'}
+            {showForgotPassword ? 'Reset Password' : (isLogin ? 'Welcome Back' : 'Create Account')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {!isLogin && (
+            {!isLogin && !showForgotPassword && (
               <div className="relative">
                 <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
@@ -96,32 +105,54 @@ const Auth = () => {
                 required
               />
             </div>
-            <div className="relative">
-              <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="pl-10 bg-white/5 border-white/20 text-white placeholder:text-gray-400"
-                required
-              />
-            </div>
+            {!showForgotPassword && (
+              <div className="relative">
+                <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="pl-10 bg-white/5 border-white/20 text-white placeholder:text-gray-400"
+                  required
+                />
+              </div>
+            )}
             <Button 
               type="submit"
               disabled={loading}
               className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
             >
-              {loading ? 'Loading...' : (isLogin ? 'Sign In' : 'Sign Up')}
+              {loading ? 'Loading...' : (showForgotPassword ? 'Send Reset Email' : (isLogin ? 'Sign In' : 'Sign Up'))}
             </Button>
           </form>
-          <div className="mt-4 text-center">
-            <button
-              onClick={() => setIsLogin(!isLogin)}
-              className="text-purple-300 hover:text-white transition-colors"
-            >
-              {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
-            </button>
+          <div className="mt-4 text-center space-y-2">
+            {!showForgotPassword && (
+              <>
+                <button
+                  onClick={() => setIsLogin(!isLogin)}
+                  className="text-purple-300 hover:text-white transition-colors block"
+                >
+                  {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
+                </button>
+                {isLogin && (
+                  <button
+                    onClick={() => setShowForgotPassword(true)}
+                    className="text-purple-300 hover:text-white transition-colors block"
+                  >
+                    Forgot your password?
+                  </button>
+                )}
+              </>
+            )}
+            {showForgotPassword && (
+              <button
+                onClick={() => setShowForgotPassword(false)}
+                className="text-purple-300 hover:text-white transition-colors"
+              >
+                Back to sign in
+              </button>
+            )}
           </div>
         </CardContent>
       </Card>
