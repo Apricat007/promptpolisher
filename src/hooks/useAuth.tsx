@@ -60,17 +60,13 @@ export const useAuth = () => {
 
   const signOut = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (!error) {
-        // Force a clean redirect without auth state conflicts
-        setTimeout(() => {
-          window.location.href = '/logout-success';
-        }, 100);
-      }
-      return { error };
+      await supabase.auth.signOut();
+      // Always redirect to logout success page regardless of errors
+      window.location.href = '/logout-success';
     } catch (error) {
       console.error('Sign out error:', error);
-      return { error };
+      // Still redirect even if there's an error
+      window.location.href = '/logout-success';
     }
   };
 
