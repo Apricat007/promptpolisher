@@ -18,10 +18,10 @@ const Navbar = () => {
           </span>
         </Link>
         
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 md:gap-4">
           {user ? (
             <>
-              <div className="flex items-center gap-2 text-white">
+              <div className="hidden sm:flex items-center gap-2 text-white">
                 <User className="h-4 w-4" />
                 <span className="text-sm">{user.email}</span>
               </div>
@@ -29,17 +29,19 @@ const Navbar = () => {
                 onClick={signOut}
                 variant="ghost"
                 size="sm"
-                className="text-white hover:bg-white/10"
+                className="text-white hover:bg-white/10 text-xs md:text-sm px-2 md:px-3"
               >
-                <LogOut className="h-4 w-4 mr-2" />
-                Sign Out
+                <LogOut className="h-4 w-4 mr-1 md:mr-2" />
+                <span className="hidden xs:inline">Sign Out</span>
+                <span className="xs:hidden">Out</span>
               </Button>
             </>
           ) : (
             <Link to="/auth">
-              <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">
-                <User className="h-4 w-4 mr-2" />
-                Sign In
+              <Button variant="ghost" size="sm" className="text-white hover:bg-white/10 text-xs md:text-sm px-2 md:px-3">
+                <User className="h-4 w-4 mr-1 md:mr-2" />
+                <span className="hidden xs:inline">Sign In</span>
+                <span className="xs:hidden">In</span>
               </Button>
             </Link>
           )}

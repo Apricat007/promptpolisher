@@ -60,8 +60,21 @@ export const useAuth = () => {
 
   const signOut = async () => {
     try {
-      await supabase.auth.signOut();
-      // Always redirect to logout success page regardless of errors
+      // Clear all local storage auth data first
+      Object.keys(localStorage).forEach((key) => {
+        if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+          localStorage.removeItem(key);
+        }
+      });
+      
+      // Clear session and user state immediately
+      setSession(null);
+      setUser(null);
+      
+      // Attempt to sign out from Supabase
+      await supabase.auth.signOut({ scope: 'global' });
+      
+      // Always redirect regardless of success/failure
       window.location.href = '/logout-success';
     } catch (error) {
       console.error('Sign out error:', error);
