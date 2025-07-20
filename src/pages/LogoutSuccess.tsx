@@ -12,13 +12,13 @@ const LogoutSuccess = () => {
         <p className="text-white/80 mb-6">You have been safely signed out of your account.</p>
         
         <div className="space-y-3">
-          <Link to="/auth">
-            <Button className="w-full">
+          <Link to="/auth" className="block">
+            <Button className="w-full bg-primary hover:bg-primary/90">
               Sign In Again
             </Button>
           </Link>
-          <Link to="/">
-            <Button variant="outline" className="w-full text-white border-white/20 hover:bg-white/10">
+          <Link to="/" className="block">
+            <Button variant="outline" className="w-full text-white border-white/30 hover:bg-white/10 hover:text-white">
               Go to Home
             </Button>
           </Link>

@@ -59,11 +59,19 @@ export const useAuth = () => {
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (!error) {
-      window.location.href = '/logout-success';
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (!error) {
+        // Force a clean redirect without auth state conflicts
+        setTimeout(() => {
+          window.location.href = '/logout-success';
+        }, 100);
+      }
+      return { error };
+    } catch (error) {
+      console.error('Sign out error:', error);
+      return { error };
     }
-    return { error };
   };
 
   return {
