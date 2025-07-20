@@ -2,8 +2,10 @@
 import { useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { useNavigate } from 'react-router-dom';
 
 export const useAuth = () => {
+  const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
@@ -76,15 +78,15 @@ export const useAuth = () => {
         // Ignore errors, we've already cleared local state
       });
       
-      // Use setTimeout to ensure state updates are processed
+      // Use navigate for proper SPA routing
       setTimeout(() => {
-        window.location.href = '/logout-success';
+        navigate('/logout-success');
       }, 100);
     } catch (error) {
       console.error('Sign out error:', error);
       // Still redirect even if there's an error
       setTimeout(() => {
-        window.location.href = '/logout-success';
+        navigate('/logout-success');
       }, 100);
     }
   };
