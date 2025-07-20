@@ -71,15 +71,21 @@ export const useAuth = () => {
       setSession(null);
       setUser(null);
       
-      // Attempt to sign out from Supabase
-      await supabase.auth.signOut({ scope: 'global' });
+      // Attempt to sign out from Supabase (don't wait for it)
+      supabase.auth.signOut({ scope: 'global' }).catch(() => {
+        // Ignore errors, we've already cleared local state
+      });
       
-      // Always redirect regardless of success/failure
-      window.location.href = '/logout-success';
+      // Use setTimeout to ensure state updates are processed
+      setTimeout(() => {
+        window.location.href = '/logout-success';
+      }, 100);
     } catch (error) {
       console.error('Sign out error:', error);
       // Still redirect even if there's an error
-      window.location.href = '/logout-success';
+      setTimeout(() => {
+        window.location.href = '/logout-success';
+      }, 100);
     }
   };
 
