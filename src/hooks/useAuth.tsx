@@ -61,7 +61,7 @@ export const useAuth = () => {
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (!error) {
-      window.location.href = '/auth';
+      window.location.href = '/logout-success';
     }
     return { error };
   };
