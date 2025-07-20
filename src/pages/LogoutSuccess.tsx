@@ -18,7 +18,7 @@ const LogoutSuccess = () => {
             </Button>
           </Link>
           <Link to="/" className="block">
-            <Button variant="outline" className="w-full text-white border-white/30 hover:bg-white/10 hover:text-white">
+            <Button variant="secondary" className="w-full">
               Go to Home
             </Button>
           </Link>
