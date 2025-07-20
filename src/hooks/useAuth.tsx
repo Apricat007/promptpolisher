@@ -77,17 +77,8 @@ export const useAuth = () => {
       supabase.auth.signOut({ scope: 'global' }).catch(() => {
         // Ignore errors, we've already cleared local state
       });
-      
-      // Use navigate for proper SPA routing
-      setTimeout(() => {
-        navigate('/logout-success');
-      }, 100);
     } catch (error) {
       console.error('Sign out error:', error);
-      // Still redirect even if there's an error
-      setTimeout(() => {
-        navigate('/logout-success');
-      }, 100);
     }
   };
 
