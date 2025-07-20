@@ -77,8 +77,13 @@ export const useAuth = () => {
       supabase.auth.signOut({ scope: 'global' }).catch(() => {
         // Ignore errors, we've already cleared local state
       });
+      
+      // Force page refresh to clear any cached state
+      window.location.href = '/';
     } catch (error) {
       console.error('Sign out error:', error);
+      // Force refresh even on error
+      window.location.href = '/';
     }
   };
 
